@@ -48,25 +48,21 @@ public class SellerDaoJDBC implements SellerDao {
 
 		try {
 			ps = conn.prepareStatement(
-					"SELECT seller.*,department.Name as DepName "
-					+ "FROM seller INNER JOIN department "
-					+ "ON seller.DepartmentId = department.Id " 
-					+ "WHERE seller.Id = ?");
+					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
+							+ "ON seller.DepartmentId = department.Id " + "WHERE seller.Id = ?");
 
 			ps.setInt(1, id);
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				Department dep = instantiateDepartment(rs);
 				Seller obj = instantiateSeller(rs, dep);
-				
-			return obj;
+
+				return obj;
 			}
 			return null;
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			throw new DbException(e.getMessage());
-		} 
-		finally {
+		} finally {
 			DB.closeStatement(ps);
 			DB.closeResultSet(rs);
 		}
@@ -93,28 +89,33 @@ public class SellerDaoJDBC implements SellerDao {
 	@Override
 	public List<Seller> findAll() {
 		PreparedStatement ps = null;
-		ResultSet rs = null; 		
-		
+		ResultSet rs = null;
+
 		try {
 			ps = conn.prepareStatement(
-					"SELECT seller.*,department.Name as DepName "
-					+ "FROM seller INNER JOIN department "
-					+ "ON seller.DepartmentId = department.Id "
-					+ "ORDER BY Name");
-			
+					"SELECT seller.*,department.Name as DepName " 
+			        + "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id " 
+			        + "ORDER BY Name");
+
 			rs = ps.executeQuery();
 			List<Seller> list = new ArrayList<>();
-			
-			while(rs.next()) {
-				Department dep = instantiateDepartment(rs);
-				Seller seller = instantiateSeller(rs, dep);
-				list.add(seller);
+			Map<Integer, Department> map = new HashMap<>();
+
+			while (rs.next()) {
+				Department dep = map.get(rs.getInt("DepartmentId"));
+				if (dep == null) {
+					dep = instantiateDepartment(rs);
+					map.put(rs.getInt("DepartmentId"), dep);
+				}
+				Seller obj = instantiateSeller(rs, dep);
+				list.add(obj);
 			}
 			return list;
-		}
-		catch(SQLException e) {
+		} 
+		catch (SQLException e) {
 			throw new DbException(e.getMessage());
-		}
+		} 
 		finally {
 			DB.closeStatement(ps);
 			DB.closeResultSet(rs);
@@ -123,40 +124,39 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public List<Seller> findByDepartment(Department department) {
-	   PreparedStatement ps = null;
-	   ResultSet rs= null;
-	   
-	   try {
-		   ps = conn.prepareStatement(
-				   "SELECT seller.*,department.Name as DepName "
-				   + "FROM seller INNER JOIN department "
-				   + "ON seller.DepartmentId = department.Id "
-				   + "WHERE DepartmentId = ? "
-				   + "ORDER BY Name");
-		  
-		   ps.setInt(1, department.getId());
-		   
-		   rs = ps.executeQuery();
-		   
-		   List<Seller> listSeller = new ArrayList<>();
-		   Map<Integer, Department> map = new HashMap<>();
-		   
-		   while(rs.next()) {
-			    Department dep = map.get(rs.getInt("DepartmentId"));
-				if(dep == null) {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			ps = conn.prepareStatement(
+					"SELECT seller.*,department.Name as DepName " 
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id " 
+					+ "WHERE DepartmentId = ? " 
+					+ "ORDER BY Name");
+
+			ps.setInt(1, department.getId());
+
+			rs = ps.executeQuery();
+
+			List<Seller> listSellers = new ArrayList<>();
+			Map<Integer, Department> map = new HashMap<>();
+
+			while (rs.next()) {
+				Department dep = map.get(rs.getInt("DepartmentId"));
+				if (dep == null) {
 					dep = instantiateDepartment(rs);
 					map.put(rs.getInt("DepartmentId"), dep);
 				}
-			    
-			    Seller obj = instantiateSeller(rs, dep);
-				listSeller.add(obj);
+				Seller obj = instantiateSeller(rs, dep);
+				listSellers.add(obj);
 			}
-			return listSeller;
+			return listSellers;
 		} 
-	    catch (SQLException e) {
+		catch (SQLException e) {
 			throw new DbException(e.getMessage());
 		} 
-	    finally {
+		finally {
 			DB.closeStatement(ps);
 			DB.closeResultSet(rs);
 		}
