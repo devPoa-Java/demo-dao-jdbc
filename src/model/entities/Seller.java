@@ -45,7 +45,7 @@ public class Seller implements Serializable {
 	}
 	
 	
-	public String getEmail(String email) {
+	public String getEmail() {
 		return email;
 	}
 	public void setEmail(String email) {
