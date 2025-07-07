@@ -14,6 +14,12 @@ public class Program2 {
 		Department newDepartment = new Department(null, "Higiene e Limpeza");
 		departmentDao.insert(newDepartment);
 		System.out.println("Inserted! New id= " + newDepartment.getId());
+		System.out.println();
+		System.out.println("---Teste 2: Department findById---");
+		Department dep = departmentDao.findById(1);
+		System.out.println(dep);
+		
+		
 
 	}
 
