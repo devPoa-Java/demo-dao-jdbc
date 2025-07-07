@@ -68,6 +68,7 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 					+ "where id=?");
 			
 			ps.setString(1, obj.getName());
+			ps.setInt(2, obj.getId());
 			ps.executeUpdate();
 		
 		
@@ -75,11 +76,6 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 		catch(SQLException e) {
 			throw new DbException(e.getMessage());
 		}
-		
-		
-		
-		
-		
 	}
 
 	@Override
